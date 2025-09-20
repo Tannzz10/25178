@@ -1,30 +1,13 @@
-// src/utils/auth.js
 
-// Hardcoded credentials (can be expanded later)
-const validUser = {
-  username: "admin",
-  password: "1234",
+const loggingMiddleware = (store) => (next) => (action) => {
+  console.log("Logging Middleware Triggered:", action);
+
+  // You could also save logs in localStorage
+  const logs = JSON.parse(localStorage.getItem("logs") || "[]");
+  logs.push({ action, time: new Date().toISOString() });
+  localStorage.setItem("logs", JSON.stringify(logs));
+
+  return next(action);
 };
 
-// ✅ Middleware-like login check
-export function login(username, password) {
-  if (username === validUser.username && password === validUser.password) {
-    localStorage.setItem("loggedIn", "true");
-    localStorage.setItem("username", username);
-    return true;
-  }
-  return false;
-}
-
-export function logout() {
-  localStorage.removeItem("loggedIn");
-  localStorage.removeItem("username");
-}
-
-export function isLoggedIn() {
-  return localStorage.getItem("loggedIn") === "true";
-}
-
-export function getCurrentUser() {
-  return localStorage.getItem("username") || "";
-}
+export default loggingMiddleware;

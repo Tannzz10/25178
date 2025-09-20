@@ -1,76 +1,47 @@
-// src/components/UrlShortener.js
-import React, { useState, useEffect } from "react";
-import { isLoggedIn, getCurrentUser, logout } from "../utils/auth";
 
-export default function UrlShortener() {
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [longUrl, setLongUrl] = useState("");
+import React, { useState } from "react";
+
+export default function URLShortener() {
+  const [url, setUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
-  const [user, setUser] = useState("");
 
-  useEffect(() => {
-    // Middleware check
-    if (isLoggedIn()) {
-      setLoggedIn(true);
-      setUser(getCurrentUser());
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-    // Redirect if visiting short link
-    if (window.location.hash) {
-      const code = window.location.hash.substring(1);
-      const original = localStorage.getItem(code);
-      if (original) {
-        window.location.href = original;
-      }
-    }
-  }, []);
+    if (!url) return;
 
-  const handleShorten = () => {
-    if (!longUrl) {
-      alert("Enter a URL!");
-      return;
-    }
-    const shortCode = Math.random().toString(36).substring(2, 7);
-    localStorage.setItem(shortCode, longUrl);
-    const shortLink = window.location.origin + "/#" + shortCode;
-    setShortUrl(shortLink);
+    // Simple random short URL generator
+    const randomString = Math.random().toString(36).substring(7);
+    setShortUrl(`http://localhost:3000/${randomString}`);
   };
-
-  const handleLogout = () => {
-    logout();
-    setLoggedIn(false);
-    setUser("");
-  };
-
-  if (!loggedIn) {
-    return <p style={{ color: "red" }}>⚠ Please login first to access the URL shortener.</p>;
-  }
 
   return (
-    <div style={{ fontFamily: "Arial", padding: "20px" }}>
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
       <h2>URL Shortener</h2>
-      <p>✅ Welcome, {user}!</p>
-
-      <input
-        type="text"
-        placeholder="Enter long URL"
-        value={longUrl}
-        onChange={(e) => setLongUrl(e.target.value)}
-      />
-      <br />
-      <button onClick={handleShorten}>Shorten</button>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="Enter your URL"
+          style={{ padding: "8px", width: "250px" }}
+        />
+        <button type="submit" style={{ marginLeft: "10px", padding: "8px" }}>
+          Shorten
+        </button>
+      </form>
 
       {shortUrl && (
-        <p>
-          Short URL:{" "}
-          <a href={shortUrl} target="_blank" rel="noreferrer">
-            {shortUrl}
-          </a>
-        </p>
+        <div style={{ marginTop: "20px" }}>
+          <p>Original URL: {url}</p>
+          <p>
+            Short URL:{" "}
+            <a href={url} target="_blank" rel="noopener noreferrer">
+              {shortUrl}
+            </a>
+          </p>
+        </div>
       )}
-
-      <br />
-      <button onClick={handleLogout}>Logout</button>
     </div>
   );
 }
