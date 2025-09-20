@@ -1,25 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import React, { useState } from "react";
+import { login, isLoggedIn } from "./utils/auth";
+import UrlShortener from "./components/URLShortener";
 
-function App() {
+export default function App() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loggedIn, setLoggedIn] = useState(isLoggedIn());
+
+  const handleLogin = () => {
+    if (login(username, password)) {
+      setLoggedIn(true);
+      alert("✅ Login successful!");
+    } else {
+      alert("❌ Invalid credentials!");
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ fontFamily: "Arial", padding: "20px" }}>
+      {!loggedIn ? (
+        <div>
+          <h2>Login</h2>
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <br />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <br />
+          <button onClick={handleLogin}>Login</button>
+        </div>
+      ) : (
+        <UrlShortener />
+      )}
     </div>
   );
 }
-
-export default App;
